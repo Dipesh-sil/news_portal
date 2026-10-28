@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     };
 
     const currentData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8') || '[]');
-    currentData.push(record);
+    currentData.unshift(record); // newest first
     fs.writeFileSync(DATA_FILE, JSON.stringify(currentData, null, 2));
 
     return NextResponse.json({ success: true, record });
@@ -87,5 +87,30 @@ export async function GET() {
     return NextResponse.json(data);
   } catch {
     return NextResponse.json([]);
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  ensureDataFile();
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+    const clearAll = searchParams.get('clearAll');
+
+    if (clearAll === 'true') {
+      fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2));
+      return NextResponse.json({ success: true, message: 'All records cleared' });
+    }
+
+    if (id) {
+      let currentData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8') || '[]');
+      currentData = currentData.filter((item: { id: string }) => item.id !== id);
+      fs.writeFileSync(DATA_FILE, JSON.stringify(currentData, null, 2));
+      return NextResponse.json({ success: true, message: 'Record deleted' });
+    }
+
+    return NextResponse.json({ error: 'Provide id or clearAll' }, { status: 400 });
+  } catch {
+    return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
   }
 }
