@@ -18,7 +18,7 @@ const notoDevanagari = Noto_Sans_Devanagari({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://bulletkhabar.com.np'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://bulletkhabar.pages.dev'),
   title: {
     default: 'Bullet Khabar | बुलेट खबर - Nepal\'s Fastest Bilingual News',
     template: '%s | Bullet Khabar',
