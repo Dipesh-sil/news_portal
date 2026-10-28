@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bullet Khabar - Admin Dashboard Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+    line-height: 1.7;
+    background: #fff;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 32px;
+  }
+
+  @media print {
+    body { padding: 20px; font-size: 11pt; }
+    .page-break { page-break-before: always; }
+    .no-print { display: none; }
+  }
+
+  /* Cover */
+  .cover {
+    text-align: center;
+    padding: 80px 20px;
+    border-bottom: 3px solid #DC2626;
+    margin-bottom: 40px;
+  }
+  .cover .brand {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: -1px;
+  }
+  .cover .brand .black { color: #1e293b; }
+  .cover .brand .red { color: #DC2626; }
+  .cover .subtitle {
+    font-size: 22px;
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 8px;
+  }
+  .cover .version {
+    margin-top: 24px;
+    font-size: 13px;
+    color: #94a3b8;
+  }
+
+  /* Headings */
+  h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 48px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 32px 0 12px;
+  }
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #334155;
+    margin: 24px 0 8px;
+  }
+
+  p { margin: 8px 0; color: #475569; }
+
+  /* Step boxes */
+  .step {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #2563EB;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+  .step-number {
+    display: inline-block;
+    background: #2563EB;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  .step-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: #1e293b;
+    display: inline;
+  }
+  .step p { margin: 8px 0 0 38px; font-size: 14px; }
+
+  /* Warning / Info boxes */
+  .warning {
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #92400e;
+  }
+  .warning::before { content: "⚠ "; font-weight: 700; }
+
+  .info {
+    background: #eff6ff;
+    border: 1px solid #93c5fd;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #1e40af;
+  }
+  .info::before { content: "ℹ "; font-weight: 700; }
+
+  .success {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #166534;
+  }
+
+  /* Code */
+  code {
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #DC2626;
+    font-family: 'SF Mono', 'Consolas', monospace;
+  }
+  .url {
+    background: #f1f5f9;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2563EB;
+    display: block;
+    margin: 12px 0;
+    text-align: center;
+    font-family: 'SF Mono', 'Consolas', monospace;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th {
+    background: #1e293b;
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #475569;
+  }
+  tr:nth-child(even) td { background: #f8fafc; }
+
+  /* Ordered list */
+  ol, ul {
+    margin: 8px 0 8px 24px;
+    color: #475569;
+    font-size: 14px;
+  }
+  li { margin: 6px 0; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 32px 0;
+  }
+
+  .footer {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 12px;
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <div class="brand">
+    <span class="black">BULLET</span> <span class="red">KHABAR</span>
+  </div>
+  <div class="subtitle">Admin Dashboard Guide</div>
+  <p style="color: #94a3b8; margin-top: 4px;">बुलेट खबर - एडमिन ड्यासबोर्ड गाइड</p>
+  <div class="version">
+    Version 1.0 &nbsp;|&nbsp; March 2026<br>
+    Prepared for: Client / News Team
+  </div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<h1>Table of Contents</h1>
+<ol style="font-size: 15px; line-height: 2.2;">
+  <li><a href="#setup" style="color: #2563EB; text-decoration: none;">One-Time Setup (for Admin/Developer)</a></li>
+  <li><a href="#client-access" style="color: #2563EB; text-decoration: none;">How to Give Client Access</a></li>
+  <li><a href="#login" style="color: #2563EB; text-decoration: none;">How to Login to Dashboard</a></li>
+  <li><a href="#write-article" style="color: #2563EB; text-decoration: none;">How to Write & Publish an Article</a></li>
+  <li><a href="#upload-images" style="color: #2563EB; text-decoration: none;">How to Upload Images</a></li>
+  <li><a href="#manage-content" style="color: #2563EB; text-decoration: none;">Managing Jobs, Notices & Banners</a></li>
+  <li><a href="#how-it-works" style="color: #2563EB; text-decoration: none;">How Publishing Works (Behind the Scenes)</a></li>
+  <li><a href="#troubleshooting" style="color: #2563EB; text-decoration: none;">Troubleshooting</a></li>
+</ol>
+
+<div class="page-break"></div>
+
+<!-- SECTION 1: ONE-TIME SETUP -->
+<h1 id="setup">1. One-Time Setup (for Admin/Developer)</h1>
+<p>Before your client can use the dashboard, you (the developer) need to create a GitHub token for them. This only needs to be done once.</p>
+
+<h2>Create a GitHub Personal Access Token</h2>
+
+<div class="step">
+  <span class="step-number">1</span>
+  <span class="step-title">Go to GitHub Token Settings</span>
+  <p>Open this URL in your browser:<br>
+  <code>https://github.com/settings/tokens?type=beta</code><br>
+  (This opens Fine-grained Personal Access Tokens page)</p>
+</div>
+
+<div class="step">
+  <span class="step-number">2</span>
+  <span class="step-title">Click "Generate new token"</span>
+  <p>Choose <strong>Fine-grained personal access token</strong> (recommended for security).</p>
+</div>
+
+<div class="step">
+  <span class="step-number">3</span>
+  <span class="step-title">Configure the token</span>
+  <p>
+    <strong>Token name:</strong> <code>bullet-khabar-admin</code><br>
+    <strong>Expiration:</strong> 90 days or Custom (set a reminder to renew)<br>
+    <strong>Repository access:</strong> Select "Only select repositories" &rarr; choose <code>bullet-khabar</code><br>
+    <strong>Permissions &rarr; Repository permissions:</strong>
+  </p>
+  <table>
+    <tr><th>Permission</th><th>Access Level</th></tr>
+    <tr><td>Contents</td><td><strong>Read and write</strong></td></tr>
+    <tr><td>Metadata</td><td>Read-only (auto-selected)</td></tr>
+  </table>
+  <p>Leave all other permissions as "No access".</p>
+</div>
+
+<div class="step">
+  <span class="step-number">4</span>
+  <span class="step-title">Generate & copy the token</span>
+  <p>Click "Generate token". <strong>Copy the token immediately</strong> &mdash; you won't see it again!<br>
+  It looks like: <code>github_pat_xxxxxxxxxxxx...</code></p>
+</div>
+
+<div class="warning">
+  Keep this token secret! Anyone with this token can edit your news content. Never share it publicly.
+</div>
+
+<div class="page-break"></div>
+
+<!-- SECTION 2: GIVING CLIENT ACCESS -->
+<h1 id="client-access">2. How to Give Client Access</h1>
+<p>Your client does NOT need a GitHub account or any technical knowledge. You just give them 3 things:</p>
+
+<div class="success">
+  <strong>Send these 3 things to your client (via secure message/email):</strong>
+</div>
+
+<table>
+  <tr><th>#</th><th>What to Send</th><th>Example</th></tr>
+  <tr>
+    <td>1</td>
+    <td><strong>Dashboard URL</strong></td>
+    <td><code>https://bulletkhabar.com.np/admin</code></td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td><strong>GitHub Token</strong></td>
+    <td><code>github_pat_xxxxxxxxxx...</code></td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td><strong>Repository Name</strong></td>
+    <td><code>yourusername/bullet-khabar</code></td>
+  </tr>
+</table>
+
+<p>That's it! The client opens the URL, enters the token and repo name, and they're in.</p>
+
+<h2>Access Levels</h2>
+<table>
+  <tr><th>Role</th><th>What They Get</th><th>How</th></tr>
+  <tr>
+    <td><strong>News Editor / Client</strong></td>
+    <td>Write articles, upload images, manage jobs/notices/banners</td>
+    <td>Dashboard URL + Token + Repo name</td>
+  </tr>
+  <tr>
+    <td><strong>Developer / Admin</strong></td>
+    <td>Everything above + code access, deployment, settings</td>
+    <td>GitHub repo owner access</td>
+  </tr>
+</table>
+
+<h2>Multiple Editors</h2>
+<p>To give access to multiple people (e.g., 3 journalists), you can either:</p>
+<ul>
+  <li><strong>Option A:</strong> Share the same token with all editors (simpler)</li>
+  <li><strong>Option B:</strong> Create separate tokens for each person (more secure &mdash; you can revoke one person's access without affecting others)</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- SECTION 3: LOGIN -->
+<h1 id="login">3. How to Login to Dashboard</h1>
+
+<div class="step">
+  <span class="step-number">1</span>
+  <span class="step-title">Open the Admin Dashboard</span>
+  <p>Go to your website URL with <code>/admin</code> at the end:</p>
+</div>
+
+<div class="url">https://your-domain.com/admin</div>
+
+<div class="step">
+  <span class="step-number">2</span>
+  <span class="step-title">Enter your credentials</span>
+  <p>
+    <strong>GitHub Token:</strong> Paste the token you received<br>
+    <strong>Repository:</strong> Enter the repo name (e.g., <code>username/bullet-khabar</code>)
+  </p>
+</div>
+
+<div class="step">
+  <span class="step-number">3</span>
+  <span class="step-title">Click "Login to Dashboard"</span>
+  <p>Your credentials are saved in your browser. You won't need to login again on the same browser unless you clear your data or click Logout.</p>
+</div>
+
+<div class="info">
+  Your login is saved locally in your browser only. It is not sent to any server. Each device/browser needs its own login.
+</div>
+
+<div class="page-break"></div>
+
+<!-- SECTION 4: WRITE ARTICLE -->
+<h1 id="write-article">4. How to Write & Publish an Article</h1>
+
+<div class="step">
+  <span class="step-number">1</span>
+  <span class="step-title">Click "New Article" in the sidebar</span>
+  <p>Or click the blue "+ New Article" button on the dashboard.</p>
+</div>
+
+<div class="step">
+  <span class="step-number">2</span>
+  <span class="step-title">Fill in the article details</span>
+  <p>The editor has two columns &mdash; English on the left, Nepali on the right:</p>
+  <table>
+    <tr><th>Field</th><th>What to Enter</th></tr>
+    <tr><td><strong>English Title</strong></td><td>The headline in English</td></tr>
+    <tr><td><strong>Nepali Title</strong></td><td>The headline in Nepali (नेपाली शीर्षक)</td></tr>
+    <tr><td><strong>Date</strong></td><td>Publication date (auto-filled with today)</td></tr>
+    <tr><td><strong>BS Date</strong></td><td>Nepali date, e.g. <code>२०८३ चैत्र १७</code></td></tr>
+    <tr><td><strong>Category</strong></td><td>Click one: Nepal, Politics, World, Business, Sports, Technology</td></tr>
+    <tr><td><strong>Author</strong></td><td>Writer's name</td></tr>
+    <tr><td><strong>Featured Image</strong></td><td>Upload or drag & drop an image (see Section 5)</td></tr>
+    <tr><td><strong>English TL;DR</strong></td><td>3 bullet points separated by <code>|</code><br>Example: <code>Point one|Point two|Point three</code></td></tr>
+    <tr><td><strong>Nepali TL;DR</strong></td><td>Same format in Nepali: <code>बुँदा एक|बुँदा दुई|बुँदा तीन</code></td></tr>
+    <tr><td><strong>English Content</strong></td><td>Full article body in English</td></tr>
+    <tr><td><strong>Nepali Content</strong></td><td>Full article body in Nepali</td></tr>
+  </table>
+</div>
+
+<div class="step">
+  <span class="step-number">3</span>
+  <span class="step-title">Check "Published" checkbox</span>
+  <p>If unchecked, the article is saved as a draft and won't appear on the website.</p>
+</div>
+
+<div class="step">
+  <span class="step-number">4</span>
+  <span class="step-title">Click "Publish Article"</span>
+  <p>The article is saved to GitHub and will appear on the website within 1-2 minutes after Cloudflare rebuilds the site.</p>
+</div>
+
+<div class="info">
+  <strong>AI Assist Buttons:</strong> The "AI Generate" buttons next to TL;DR fields can auto-generate bullet point summaries from your article content (requires Gemini API key in Settings).
+</div>
+
+<div class="page-break"></div>
+
+<!-- SECTION 5: UPLOAD IMAGES -->
+<h1 id="upload-images">5. How to Upload Images</h1>
+<p>Images are hosted for free in your GitHub repository and served through Cloudflare CDN (fast worldwide).</p>
+
+<h2>Method 1: Drag & Drop (Recommended)</h2>
+<div class="step">
+  <span class="step-number">1</span>
+  <span class="step-title">Find the "Featured Image" section in the article editor</span>
+  <p>You'll see a dashed-border upload area.</p>
+</div>
+<div class="step">
+  <span class="step-number">2</span>
+  <span class="step-title">Drag an image file from your computer and drop it on the upload area</span>
+  <p>Or click the area to browse and select a file.</p>
+</div>
+<div class="step">
+  <span class="step-number">3</span>
+  <span class="step-title">Wait for upload</span>
+  <p>You'll see "Uploading to GitHub..." then "Uploaded!" when done. A preview will appear above.</p>
+</div>
+
+<h2>Method 2: Manual Path</h2>
+<p>If you've already uploaded images to the GitHub repo, type the path directly in the text field below the upload area:</p>
+<p><code>/images/uploads/my-photo.jpg</code></p>
+
+<h2>Image Guidelines</h2>
+<table>
+  <tr><th>Rule</th><th>Recommendation</th></tr>
+  <tr><td>Format</td><td>JPG, PNG, or WebP</td></tr>
+  <tr><td>Max Size</td><td>5 MB per image</td></tr>
+  <tr><td>Ideal Dimensions</td><td>1200 x 630 px (16:9 ratio, best for social sharing)</td></tr>
+  <tr><td>Naming</td><td>Use descriptive names: <code>nepal-flood-2026.jpg</code></td></tr>
+</table>
+
+<div class="info">
+  <strong>Where are images stored?</strong> Images are uploaded to <code>public/images/uploads/</code> in your GitHub repository. They are served through Cloudflare's global CDN for fast loading worldwide. This is 100% free &mdash; no hosting costs.
+</div>
+
+<h2>Removing an Image</h2>
+<p>Click the <strong>X</strong> button on the top-right corner of the image preview to remove it from the article. (The file stays in GitHub &mdash; to delete it permanently, remove it from the repo.)</p>
+
+<div class="page-break"></div>
+
+<!-- SECTION 6: JOBS, NOTICES, BANNERS -->
+<h1 id="manage-content">6. Managing Jobs, Notices & Banners</h1>
+
+<h2>Jobs (रोजगार)</h2>
+<p>Post job listings visible on the <code>/jobs</code> page:</p>
+<ul>
+  <li>Job Title, Company, Location, Description, Contact Info</li>
+  <li>Set an expiry date &mdash; expired jobs auto-hide</li>
+</ul>
+
+<h2>Notices (सूचना)</h2>
+<p>Post public notices/announcements on the <code>/notices</code> page:</p>
+<ul>
+  <li>Notice Title, Description, Date, Contact</li>
+</ul>
+
+<h2>Banners / Ads (विज्ञापन)</h2>
+<p>Manage advertisement banners that appear throughout the site:</p>
+
+<table>
+  <tr><th>Position</th><th>Size</th><th>Where It Appears</th></tr>
+  <tr><td>Article Top</td><td>728 x 90</td><td>Above article content</td></tr>
+  <tr><td>Article Bottom</td><td>728 x 90</td><td>Below article content</td></tr>
+  <tr><td>Sidebar</td><td>300 x 250</td><td>Right sidebar on homepage</td></tr>
+  <tr><td>Homepage Mid</td><td>970 x 90</td><td>Middle of homepage</td></tr>
+  <tr><td>Header Below</td><td>970 x 90</td><td>Below the navigation bar</td></tr>
+</table>
+
+<p>For each banner, set:</p>
+<ul>
+  <li><strong>Banner Image:</strong> Upload the ad creative</li>
+  <li><strong>Click URL:</strong> Where users go when they click the ad</li>
+  <li><strong>Start/End Date:</strong> Schedule when the ad runs</li>
+  <li><strong>Advertiser:</strong> Client name for your records</li>
+  <li><strong>Active:</strong> Toggle on/off instantly</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- SECTION 7: HOW IT WORKS -->
+<h1 id="how-it-works">7. How Publishing Works (Behind the Scenes)</h1>
+<p>Understanding the flow helps when troubleshooting:</p>
+
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin: 20px 0; text-align: center;">
+  <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
+    <div style="background: #2563EB; color: #fff; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 14px;">
+      You write article<br>in Dashboard
+    </div>
+    <span style="font-size: 20px; color: #94a3b8;">&rarr;</span>
+    <div style="background: #1e293b; color: #fff; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 14px;">
+      Saved to<br>GitHub
+    </div>
+    <span style="font-size: 20px; color: #94a3b8;">&rarr;</span>
+    <div style="background: #f97316; color: #fff; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 14px;">
+      Cloudflare detects<br>change &amp; rebuilds
+    </div>
+    <span style="font-size: 20px; color: #94a3b8;">&rarr;</span>
+    <div style="background: #16a34a; color: #fff; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 14px;">
+      Live on website<br>(1-2 min)
+    </div>
+  </div>
+</div>
+
+<h2>Timeline</h2>
+<table>
+  <tr><th>Step</th><th>Time</th></tr>
+  <tr><td>Click "Publish" in dashboard</td><td>Instant</td></tr>
+  <tr><td>File appears in GitHub</td><td>1-3 seconds</td></tr>
+  <tr><td>Cloudflare starts rebuilding</td><td>~30 seconds</td></tr>
+  <tr><td>Article live on website</td><td>1-2 minutes total</td></tr>
+</table>
+
+<h2>Cost</h2>
+<table>
+  <tr><th>Service</th><th>Cost</th><th>Purpose</th></tr>
+  <tr><td>GitHub</td><td>Free</td><td>Stores all content & images</td></tr>
+  <tr><td>Cloudflare Pages</td><td>Free</td><td>Hosts the website globally</td></tr>
+  <tr><td>Domain (.com.np)</td><td>Free / ~$10/yr</td><td>Your website address</td></tr>
+  <tr><td>Gemini AI (optional)</td><td>Free tier</td><td>Auto-generate summaries</td></tr>
+  <tr><td><strong>Total</strong></td><td><strong>$0 - $10/year</strong></td><td></td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<!-- SECTION 8: TROUBLESHOOTING -->
+<h1 id="troubleshooting">8. Troubleshooting</h1>
+
+<table>
+  <tr><th>Problem</th><th>Solution</th></tr>
+  <tr>
+    <td>"Login required to upload"</td>
+    <td>You're not logged in. Enter your GitHub token and repo name on the login screen.</td>
+  </tr>
+  <tr>
+    <td>Image upload fails</td>
+    <td>Check that your GitHub token hasn't expired. Generate a new one if needed.</td>
+  </tr>
+  <tr>
+    <td>Article not appearing on site</td>
+    <td>Wait 2 minutes for Cloudflare to rebuild. Also check if "Published" checkbox was ticked.</td>
+  </tr>
+  <tr>
+    <td>"Error: Resource not accessible"</td>
+    <td>Your GitHub token doesn't have "Contents: Read and write" permission. Create a new token with correct permissions.</td>
+  </tr>
+  <tr>
+    <td>Dashboard shows blank page</td>
+    <td>Clear browser cache (Ctrl+Shift+Delete) and reload.</td>
+  </tr>
+  <tr>
+    <td>Token expired</td>
+    <td>Go to GitHub Settings &rarr; Tokens &rarr; Generate a new one. Enter it on the login screen again.</td>
+  </tr>
+  <tr>
+    <td>Want to remove someone's access</td>
+    <td>Go to GitHub Settings &rarr; Tokens &rarr; Delete their token. They can no longer publish.</td>
+  </tr>
+</table>
+
+<h2>Need Help?</h2>
+<p>Contact the developer who set up Bullet Khabar for your organization. They can:</p>
+<ul>
+  <li>Generate new tokens if yours expires</li>
+  <li>Fix any deployment issues</li>
+  <li>Add new features or pages</li>
+</ul>
+
+<hr class="divider">
+
+<!-- QUICK REFERENCE CARD -->
+<h1>Quick Reference Card</h1>
+<p style="color: #64748b; font-size: 14px;">Print this page and keep it handy.</p>
+
+<table>
+  <tr><th>Action</th><th>How</th></tr>
+  <tr><td>Open Dashboard</td><td>Go to <code>your-domain.com/admin</code></td></tr>
+  <tr><td>Write New Article</td><td>Sidebar &rarr; New Article &rarr; Fill fields &rarr; Publish</td></tr>
+  <tr><td>Upload Image</td><td>Drag & drop onto the upload area in article editor</td></tr>
+  <tr><td>Add TL;DR</td><td>3 points separated by <code>|</code> pipe symbol</td></tr>
+  <tr><td>Choose Category</td><td>Click a category pill (Nepal, Politics, World, etc.)</td></tr>
+  <tr><td>Save as Draft</td><td>Uncheck "Published" before saving</td></tr>
+  <tr><td>Publish Live</td><td>Check "Published" &rarr; Click "Publish Article"</td></tr>
+  <tr><td>Add Banner/Ad</td><td>Sidebar &rarr; Banners &rarr; Fill details &rarr; Save</td></tr>
+  <tr><td>Logout</td><td>Click Logout button in sidebar</td></tr>
+</table>
+
+<div class="footer">
+  <strong>BULLET</strong> <span style="color: #DC2626; font-weight: 700;">KHABAR</span> &nbsp;|&nbsp; Admin Guide v1.0 &nbsp;|&nbsp; March 2026<br>
+  &copy; 2026 Bullet Khabar. Confidential &mdash; for authorized team members only.
+</div>
+
+</body>
+</html>

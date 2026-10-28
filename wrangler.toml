@@ -1,0 +1,6 @@
+name = "bullet-khabar-daily-news"
+main = "worker/daily-news.js"
+compatibility_date = "2024-01-01"
+
+[triggers]
+crons = ["15 0 * * *"]  # 6:00 AM Nepal Time (UTC+5:45 = UTC 00:15)

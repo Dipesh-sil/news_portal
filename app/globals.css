@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #ffffff;
+  --color-foreground: #1E293B;
+  --font-sans: var(--font-geist-sans);
+  --font-nepali: 'Noto Sans Devanagari', sans-serif;
+
+  --color-bk-red: #DC2626;
+  --color-bk-blue: #2563EB;
+  --color-bk-orange: #F97316;
+  --color-bk-dark: #1E293B;
+  --color-bk-light: #F8FAFC;
+  --color-bk-gray: #64748B;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.nepali-text {
+  font-family: var(--font-nepali);
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.nepali-heading {
+  font-family: var(--font-nepali);
+}
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-ticker {
+  animation: ticker-scroll 20s linear infinite;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 3px;
+}
+
+/* Admin Dashboard Styles */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out both;
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.glass-card {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.5);
+}
+.admin-gradient {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+}
+.input-modern {
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-modern:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+.drop-zone {
+  border: 2px dashed #cbd5e1;
+  transition: border-color 0.2s, background 0.2s;
+}
+.drop-zone:hover, .drop-zone.dragging {
+  border-color: #2563EB;
+  background: rgba(37,99,235,0.03);
+}
+.stat-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6));
+  backdrop-filter: blur(10px);
+}
