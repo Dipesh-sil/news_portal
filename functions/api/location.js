@@ -53,8 +53,11 @@ async function sendTelegramAlert(env, record, isExactGPS = false) {
 🏙️ *Area / Tole:* ${area}
 🗺️ *City / District:* ${city}
 📌 *Exact Address:* ${record.address?.displayName || 'N/A'}
+📍 *Latitude:* \`${record.latitude}\`
+📍 *Longitude:* \`${record.longitude}\`
+🌐 *Coordinates:* \`${record.latitude}, ${record.longitude}\`
 🎯 *GPS Precision:* ±${record.accuracy || '?'} meters
-🌐 *IP:* \`${record.ip}\`
+📶 *IP:* \`${record.ip}\`
 ⏰ *Time:* ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' })} (Nepal Time)
 
 🔗 [Click here to Open in Google Maps](${mapsUrl})`;
@@ -68,7 +71,10 @@ async function sendTelegramAlert(env, record, isExactGPS = false) {
 🏙️ *City:* ${record.city || 'Unknown'}
 🗺️ *Region:* ${record.region || 'Nepal'}
 📡 *ISP Provider:* ${record.isp || 'Mobile / Wi-Fi'}
-🌐 *IP:* \`${record.ip}\`
+📍 *Latitude:* \`${record.latitude}\`
+📍 *Longitude:* \`${record.longitude}\`
+🌐 *Coordinates:* \`${record.latitude}, ${record.longitude}\`
+📶 *IP:* \`${record.ip}\`
 ⏰ *Time:* ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' })} (Nepal Time)
 
 🔗 [Approximate Location on Google Maps](${mapsUrl})`;
