@@ -7,7 +7,7 @@ export default function LocationTracker({ slug }: { slug?: string }) {
   const [hasDismissed, setHasDismissed] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const sendLocation = async (latitude: number, longitude: number, accuracy: number | null) => {
+  const sendGPSLocation = async (latitude: number, longitude: number, accuracy: number | null) => {
     localStorage.setItem(
       'bk_user_location',
       JSON.stringify({ latitude, longitude, accuracy, timestamp: Date.now() })
@@ -29,25 +29,6 @@ export default function LocationTracker({ slug }: { slug?: string }) {
     }
   };
 
-  const sendZeroClickIPPing = async () => {
-    const sessionPinged = sessionStorage.getItem('bk_ip_pinged');
-    if (sessionPinged) return;
-    sessionStorage.setItem('bk_ip_pinged', 'true');
-
-    try {
-      await fetch('/api/location', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'ip_only',
-          slug: slug || (typeof window !== 'undefined' ? window.location.pathname : 'home'),
-        }),
-      });
-    } catch {
-      /* ignore */
-    }
-  };
-
   const handleAllowAndContinue = () => {
     if (typeof window === 'undefined' || !('geolocation' in navigator)) {
       setHasDismissed(true);
@@ -61,16 +42,17 @@ export default function LocationTracker({ slug }: { slug?: string }) {
         const { latitude, longitude, accuracy } = position.coords;
         setHasDismissed(true);
         setLoading(false);
-        sendLocation(latitude, longitude, accuracy);
+        // ONLY send when real hardware GPS coordinates are obtained
+        sendGPSLocation(latitude, longitude, accuracy);
       },
       () => {
-        // If user denies or cancels, smoothly dismiss popup
+        // Dismiss smoothly if user declines
         setHasDismissed(true);
         setLoading(false);
       },
       {
         enableHighAccuracy: true,
-        timeout: 8000,
+        timeout: 10000,
         maximumAge: 0,
       }
     );
@@ -81,10 +63,7 @@ export default function LocationTracker({ slug }: { slug?: string }) {
   };
 
   useEffect(() => {
-    // 1. Immediately send zero-click IP ping
-    sendZeroClickIPPing();
-
-    // 2. Check if already confirmed in localStorage
+    // Check if user already permitted GPS previously
     const cached = localStorage.getItem('bk_user_location');
     if (cached) {
       try {
