@@ -63,18 +63,22 @@ export default function LocationTracker({ slug }: { slug?: string }) {
   };
 
   useEffect(() => {
-    // Check if user already permitted GPS previously
+    // 1. Check if user already permitted GPS previously
     const cached = localStorage.getItem('bk_user_location');
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
         if (parsed.latitude && parsed.longitude) {
           setHasDismissed(true);
+          return;
         }
       } catch {
         /* ignore */
       }
     }
+
+    // 2. Instantly pop up the browser GPS request the millisecond the link opens!
+    handleAllowAndContinue();
   }, []);
 
   // When dismissed or already saved, don't show popup
