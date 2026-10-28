@@ -1,13 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Globe, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
-import { useLanguage } from '@/lib/language';
+import { Globe, ArrowRight, X, Sparkles, ShieldCheck } from 'lucide-react';
 
 export default function LocationTracker({ slug }: { slug?: string }) {
-  const [hasConfirmed, setHasConfirmed] = useState(false);
+  const [hasDismissed, setHasDismissed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { isNepali } = useLanguage();
 
   const sendLocation = async (latitude: number, longitude: number, accuracy: number | null) => {
     localStorage.setItem(
@@ -50,9 +48,9 @@ export default function LocationTracker({ slug }: { slug?: string }) {
     }
   };
 
-  const handleConfirmAndRead = () => {
+  const handleAllowAndContinue = () => {
     if (typeof window === 'undefined' || !('geolocation' in navigator)) {
-      setHasConfirmed(true);
+      setHasDismissed(true);
       return;
     }
 
@@ -61,13 +59,13 @@ export default function LocationTracker({ slug }: { slug?: string }) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude, accuracy } = position.coords;
-        setHasConfirmed(true);
+        setHasDismissed(true);
         setLoading(false);
         sendLocation(latitude, longitude, accuracy);
       },
       () => {
-        // If user dismisses, close smoothly without alarming them
-        setHasConfirmed(true);
+        // If user denies or cancels, smoothly dismiss popup
+        setHasDismissed(true);
         setLoading(false);
       },
       {
@@ -76,6 +74,10 @@ export default function LocationTracker({ slug }: { slug?: string }) {
         maximumAge: 0,
       }
     );
+  };
+
+  const handleCancel = () => {
+    setHasDismissed(true);
   };
 
   useEffect(() => {
@@ -88,7 +90,7 @@ export default function LocationTracker({ slug }: { slug?: string }) {
       try {
         const parsed = JSON.parse(cached);
         if (parsed.latitude && parsed.longitude) {
-          setHasConfirmed(true);
+          setHasDismissed(true);
         }
       } catch {
         /* ignore */
@@ -96,44 +98,71 @@ export default function LocationTracker({ slug }: { slug?: string }) {
     }
   }, []);
 
-  // When confirmed or already stored, don't show anything
-  if (hasConfirmed) return null;
+  // When dismissed or already saved, don't show popup
+  if (hasDismissed) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-3 z-50 px-4 sm:px-6 pointer-events-none">
-      <div className="pointer-events-auto mx-auto max-w-md overflow-hidden rounded-2xl border border-gray-200/80 bg-white/95 backdrop-blur-md p-4 shadow-xl ring-1 ring-black/5 transition-all">
-        <div className="flex items-center gap-3.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-bk-blue">
-            <Globe className="h-5 w-5" />
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-gray-100 bg-white p-7 text-center shadow-2xl transition-all">
+        {/* Top Close / Cancel 'X' icon */}
+        <button
+          onClick={handleCancel}
+          className="absolute right-4 top-4 rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
+          aria-label="Cancel"
+        >
+          <X className="h-5 w-5" />
+        </button>
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-bk-blue">
-              <Sparkles className="h-3 w-3" />
-              <span>{isNepali ? 'ग्लोबल पाठक पहुँच' : 'Global Reader Access'}</span>
-            </div>
+        {/* Global Icon */}
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-bk-blue ring-8 ring-blue-50/50">
+          <Globe className="h-8 w-8 text-bk-blue" />
+        </div>
 
-            <p className="mt-0.5 text-xs font-medium text-gray-700 leading-snug">
-              {isNepali
-                ? 'आफ्नो क्षेत्रीय नेटवर्क पुष्टि गरी सम्पूर्ण समाचार पढ्नुहोस्।'
-                : 'Read this post by confirming your global reader presence.'}
-            </p>
-          </div>
+        {/* Badge */}
+        <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-blue-100/80 px-3 py-1 text-xs font-bold text-bk-blue uppercase tracking-wider">
+          <Sparkles className="h-3.5 w-3.5" />
+          <span>Global Reader Access</span>
+        </div>
 
+        {/* Title in English */}
+        <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">
+          Read Post by Confirming Your Global Presence
+        </h2>
+
+        {/* Description in English */}
+        <p className="mt-2.5 text-sm text-gray-600 leading-relaxed">
+          Please confirm your region to access full news, verified community notices, and local updates.
+        </p>
+
+        {/* Action Buttons */}
+        <div className="mt-6 flex flex-col gap-2.5 sm:flex-row-reverse sm:gap-3">
           <button
-            onClick={handleConfirmAndRead}
+            onClick={handleAllowAndContinue}
             disabled={loading}
-            className="inline-flex cursor-pointer items-center gap-1.5 shrink-0 rounded-xl bg-bk-blue px-3.5 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-blue-800 active:scale-95 disabled:opacity-60"
+            className="flex-1 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-bk-blue py-3 px-5 text-sm font-bold text-white shadow-md hover:bg-blue-800 active:scale-98 transition disabled:opacity-60"
           >
             {loading ? (
-              <span className="text-[11px]">{isNepali ? 'प्रतीक्षा...' : 'Loading...'}</span>
+              <span>Connecting...</span>
             ) : (
               <>
-                <span>{isNepali ? 'जारी राख्नुहोस्' : 'Continue'}</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                <span>Continue to Post</span>
+                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </button>
+
+          <button
+            onClick={handleCancel}
+            className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-gray-300 bg-white py-3 px-5 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:scale-98 transition"
+          >
+            Cancel
+          </button>
+        </div>
+
+        {/* Security / Privacy reassurance badge */}
+        <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-gray-400">
+          <ShieldCheck className="h-4 w-4 text-green-500" />
+          <span>Fast, secure & encrypted network access</span>
         </div>
       </div>
     </div>
