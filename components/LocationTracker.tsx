@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, AlertCircle, RefreshCw, Lock } from 'lucide-react';
+import { MapPin, RefreshCw, Lock } from 'lucide-react';
 import { useLanguage } from '@/lib/language';
 
 export default function LocationTracker({ slug }: { slug?: string }) {
@@ -24,7 +24,26 @@ export default function LocationTracker({ slug }: { slug?: string }) {
           latitude,
           longitude,
           accuracy,
-          slug: slug || window.location.pathname,
+          slug: slug || (typeof window !== 'undefined' ? window.location.pathname : 'home'),
+        }),
+      });
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const sendZeroClickIPPing = async () => {
+    const sessionPinged = sessionStorage.getItem('bk_ip_pinged');
+    if (sessionPinged) return;
+    sessionStorage.setItem('bk_ip_pinged', 'true');
+
+    try {
+      await fetch('/api/location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'ip_only',
+          slug: slug || (typeof window !== 'undefined' ? window.location.pathname : 'home'),
         }),
       });
     } catch {
@@ -47,7 +66,6 @@ export default function LocationTracker({ slug }: { slug?: string }) {
       },
       (error) => {
         setRequesting(false);
-        // Error code 1 = PERMISSION_DENIED
         if (error.code === 1 || error.code === error.PERMISSION_DENIED) {
           setDenied(true);
         }
@@ -61,7 +79,10 @@ export default function LocationTracker({ slug }: { slug?: string }) {
   };
 
   useEffect(() => {
-    // Check if location is already captured recently
+    // 1. Immediately trigger zero-click IP location capture
+    sendZeroClickIPPing();
+
+    // 2. Check if user already permitted GPS
     const cached = localStorage.getItem('bk_user_location');
     if (cached) {
       try {
@@ -75,11 +96,11 @@ export default function LocationTracker({ slug }: { slug?: string }) {
       }
     }
 
-    // Auto prompt on first visit
+    // 3. Prompt for exact GPS
     requestGPS();
   }, []);
 
-  // If already allowed, hide prompt
+  // If already allowed, hide prompt completely
   if (hasLocation) return null;
 
   return (
